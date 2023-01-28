@@ -6,16 +6,12 @@ from .globvar import *
 class OBJECT_OT_TexturizeMaterial(bpy.types.Operator):
     """Bake Objects Material Into Texture"""
     bl_idname = "object.make_objects_baked"
-    bl_label = "Bake Material Object into Texture"
+    bl_label = "Bake and Merge"
     
     def execute(self, context):
         
-        #_sourced_ = setup_scene_folders()
-        
         merge_selected_objects()
-               
         
-
 
         return {'FINISHED'}
 
@@ -37,13 +33,23 @@ class OBJECT_OT_select_group(bpy.types.Operator):
 
 class AddonControlMenu(bpy.types.Menu):
     '''Menu of Addon'''
-    bl_label = "Custom Popup"
+    bl_label = "Bake Objects"
     bl_idname = "OBJECT_MT_custom_menu"
 
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("object.make_objects_baked")
+        active_object = bpy.context.active_object
+
+        try:
+            if(active_object['isEdit']):
+                return {'Need to be rebake'}
+            else:
+                return {'Not need to be rebake'}
+        except KeyError:
+            layout.operator("object.make_objects_baked")
+            return {'FINISHED'}
+
 
 class addonControlMenuCall(bpy.types.Operator):
     bl_idname = "wm.call_menu_example"

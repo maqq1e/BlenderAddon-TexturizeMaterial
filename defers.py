@@ -61,29 +61,25 @@ def merge_selected_objects():
     # Select this joited object
     merged_object = bpy.context.active_object
     bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
-    # Create Main Empty
-    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=merged_object.location, scale=(1, 1, 1))
-    main_emp = bpy.context.active_object
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    
     # Create Original Objects Empty
-    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=merged_object.location, scale=(0.5, 0.5, 0.5))
+    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0,0,0), scale=(0.5, 0.5, 0.5))
     org_emp = bpy.context.active_object
+    # Make Orgininal Object Empty Hide
+    bpy.ops.object.hide_view_set(unselected=False)
     # Assign Orgininal Object Empty to Main Empty
-    org_emp.parent = main_emp
-    # Assign merged object into Main Empty
-    merged_object.parent = main_emp
-    merged_object.location = (0, 0, 0)
+    org_emp.parent = merged_object
 
+    bpy.ops.object.select_all(action='DESELECT')
     # Assign all original objects into original objects empty - and hide it
     for obj in original_objects:
+        obj_matrix = obj.matrix_world.copy()
         obj.parent = org_emp
-        obj.hide_viewport = True
-    # Make Orgininal Object Empty Hide
-    org_emp.hide_viewport = True
-    
+        obj.matrix_world = obj_matrix
+        obj.select_set(True)
+        bpy.ops.object.hide_view_set(unselected=False)
 
 
-
-
-
-
-
+    merged_object['isEdit'] = True
+    merged_object['original'] = original_objects
