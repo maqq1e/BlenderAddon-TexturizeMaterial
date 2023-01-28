@@ -25,12 +25,10 @@ def unregister_keymaps():
 def register():
     for useClass in UsesClasses:
         bpy.utils.register_class(useClass)
-    bpy.types.VIEW3D_MT_object_context_menu.append(draw_bakeToButton)
     register_keymaps(addon_keymaps)
 
 def unregister():
     unregister_keymaps()
-    bpy.types.VIEW3D_MT_object_context_menu.remove(draw_bakeToButton)
     for useClass in UsesClasses:
         bpy.utils.unregister_class(useClass)
 

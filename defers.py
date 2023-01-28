@@ -1,4 +1,5 @@
 import bpy
+from .globvar import *
 
 def setup_scene_folders():
     '''Return _sourced_ folder'''
@@ -20,7 +21,7 @@ def setup_scene_folders():
     return _sourced_
     
 
-def merge_selected_objects(_sourced_):
+# def merge_selected_objects(_sourced_):
     ''''''
     _sourced_.hide_viewport = False
         
@@ -49,3 +50,40 @@ def merge_selected_objects(_sourced_):
     new_obj["original_objects"] = original_objects
     
     _sourced_.hide_viewport = True
+
+def merge_selected_objects():
+    # Get selected objects
+    original_objects = bpy.context.selected_objects
+    # Dublicate objects in scene
+    bpy.ops.object.duplicate(linked=False)
+    # Merge the copies into one mesh
+    bpy.ops.object.join()
+    # Select this joited object
+    merged_object = bpy.context.active_object
+    bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+    # Create Main Empty
+    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=merged_object.location, scale=(1, 1, 1))
+    main_emp = bpy.context.active_object
+    # Create Original Objects Empty
+    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=merged_object.location, scale=(0.5, 0.5, 0.5))
+    org_emp = bpy.context.active_object
+    # Assign Orgininal Object Empty to Main Empty
+    org_emp.parent = main_emp
+    # Assign merged object into Main Empty
+    merged_object.parent = main_emp
+    merged_object.location = (0, 0, 0)
+
+    # Assign all original objects into original objects empty - and hide it
+    for obj in original_objects:
+        obj.parent = org_emp
+        obj.hide_viewport = True
+    # Make Orgininal Object Empty Hide
+    org_emp.hide_viewport = True
+    
+
+
+
+
+
+
+

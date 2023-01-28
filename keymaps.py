@@ -19,3 +19,4 @@ def assign_hotkey(
 
 def register_keymaps(_ak):
     assign_hotkey(_ak, OBJECT_OT_select_group.bl_idname, 'LEFTMOUSE', isCtrl = True)
+    assign_hotkey(_ak, addonControlMenuCall.bl_idname, 'E', isShift = True)
