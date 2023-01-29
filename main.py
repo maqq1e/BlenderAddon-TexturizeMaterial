@@ -3,7 +3,7 @@ from .defers import *
 from .globvar import *
 
 
-class OBJECT_OT_TexturizeMaterial(bpy.types.Operator):
+class BakeAndMerge(bpy.types.Operator):
     """Bake Objects Material Into Texture"""
     bl_idname = "object.make_objects_baked"
     bl_label = "Bake and Merge"
@@ -15,7 +15,20 @@ class OBJECT_OT_TexturizeMaterial(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class OBJECT_OT_select_group(bpy.types.Operator):
+class EditOriginal(bpy.types.Operator):
+    """Edit Original Objects"""
+    bl_idname = "object.edit_original"
+    bl_label = "Edit Original"
+    
+    def execute(self, context):
+        
+        unmerge_selected_objects()
+        
+
+        return {'FINISHED'}
+
+
+class SelectGroup(bpy.types.Operator):
     """Select Group"""
     bl_idname = "object.select_group"
     bl_label = "Select Group"
@@ -45,9 +58,9 @@ class AddonControlMenu(bpy.types.Menu):
             if(active_object['isEdit']):
                 return {'Need to be rebake'}
             else:
-                return {'Not need to be rebake'}
+                layout.operator("object.edit_original", icon="MODIFIER")
         except KeyError:
-            layout.operator("object.make_objects_baked")
+            layout.operator("object.make_objects_baked", icon="EXPERIMENTAL")
             return {'FINISHED'}
 
 
@@ -63,8 +76,9 @@ class addonControlMenuCall(bpy.types.Operator):
 
 
 UsesClasses = [
-    OBJECT_OT_TexturizeMaterial,
-    OBJECT_OT_select_group,
-    AddonControlMenu, addonControlMenuCall
+    BakeAndMerge,
+    EditOriginal,
+    SelectGroup,
+    AddonControlMenu, addonControlMenuCall,
 ]
 

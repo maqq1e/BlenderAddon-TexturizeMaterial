@@ -77,9 +77,21 @@ def merge_selected_objects():
         obj_matrix = obj.matrix_world.copy()
         obj.parent = org_emp
         obj.matrix_world = obj_matrix
-        obj.select_set(True)
-        bpy.ops.object.hide_view_set(unselected=False)
+        obj.hide_viewport = True
 
 
-    merged_object['isEdit'] = True
+    merged_object['isEdit'] = False
     merged_object['original'] = original_objects
+
+def unmerge_selected_objects():
+    selected_object = bpy.context.active_object
+
+    original_objects = selected_object['original']
+
+    selected_object.hide_viewport = True
+
+    for obj in original_objects:
+        obj.hide_viewport = False
+        obj.select_set(True)
+    
+    
