@@ -104,3 +104,26 @@ def get_merged_object():
     
     merged_object.hide_viewport = False
 
+def delete_merged_object():
+    selected_object = bpy.context.active_object
+    merged_object = None
+
+
+    if(selected_object.parent == None):
+        merged_object = selected_object
+    else:  
+        merged_object = selected_object.parent.parent
+
+    for mrg_child in merged_object.children:
+        if(mrg_child.type == 'EMPTY'):
+            for org_obj in mrg_child.children:
+                org_obj.hide_viewport = False
+                org_obj.location = org_obj.location + merged_object.location
+                result_rotation = [a + b for a, b in zip(org_obj.rotation_euler, merged_object.rotation_euler)]
+                org_obj.rotation_euler = result_rotation
+        else:
+            return {'Have no empty children in delete_merged_object'}
+        bpy.data.objects.remove(mrg_child)
+        
+    bpy.data.objects.remove(merged_object)
+    

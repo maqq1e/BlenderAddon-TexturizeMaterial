@@ -11,9 +11,11 @@ class BakeAndMerge(bpy.types.Operator):
     def execute(self, context):
         
         merge_selected_objects()
-        
 
+        
         return {'FINISHED'}
+
+        
 
 class EditOriginal(bpy.types.Operator):
     """Edit Original Objects"""
@@ -23,9 +25,10 @@ class EditOriginal(bpy.types.Operator):
     def execute(self, context):
         
         unmerge_selected_objects()
-        
+
 
         return {'FINISHED'}
+        
 
 class GetPreview(bpy.types.Operator):
     """Preview Baked Object"""
@@ -35,9 +38,25 @@ class GetPreview(bpy.types.Operator):
     def execute(self, context):
         
         get_merged_object()
-        
+
 
         return {'FINISHED'}
+        
+
+
+class DeleteMergedObject(bpy.types.Operator):
+    """Delete Merged Object"""
+    bl_idname = "object.delete_merged"
+    bl_label = "Delete Merging"
+    
+    def execute(self, context):
+        
+        delete_merged_object()
+
+       
+        return {'FINISHED'}
+        
+
 
 
 
@@ -49,8 +68,10 @@ class SelectGroup(bpy.types.Operator):
 
     def execute(self, context):                
         bpy.ops.object.select_grouped(type='PARENT')
+
         
         return {'FINISHED'}
+        
 
 
 
@@ -67,19 +88,26 @@ class AddonControlMenu(bpy.types.Menu):
 
         active_object = bpy.context.active_object
 
-        
+
+        # Preview
         if(active_object.parent != None):
             layout.operator("object.preview_object", icon="RENDER_RESULT")
-            return {'FINISHED'}
+        else:
+            try:
+                # Rebake if original objects changed
+                if(active_object['isEdit']):
+                    return {'Need to be rebake'}
+                else:
+                    # Change original objects
+                    layout.operator("object.edit_original", icon="MODIFIER")
+            except KeyError:
+                # Bake original objects
+                layout.operator("object.make_objects_baked", icon="EXPERIMENTAL")
+                return {'FINISHED'}
 
-        try:
-            if(active_object['isEdit']):
-                return {'Need to be rebake'}
-            else:
-                layout.operator("object.edit_original", icon="MODIFIER")
-        except KeyError:
-            layout.operator("object.make_objects_baked", icon="EXPERIMENTAL")
-            return {'FINISHED'}
+        # Delete merged object
+        layout.operator("object.delete_merged", icon="TRASH")
+
 
 
 class addonControlMenuCall(bpy.types.Operator):
@@ -97,6 +125,7 @@ UsesClasses = [
     BakeAndMerge,
     EditOriginal,
     GetPreview,
+    DeleteMergedObject,
     SelectGroup,
     AddonControlMenu, addonControlMenuCall,
 ]
