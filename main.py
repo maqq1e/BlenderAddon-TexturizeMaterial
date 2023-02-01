@@ -27,6 +27,19 @@ class EditOriginal(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class GetPreview(bpy.types.Operator):
+    """Preview Baked Object"""
+    bl_idname = "object.preview_object"
+    bl_label = "Preview"
+    
+    def execute(self, context):
+        
+        get_merged_object()
+        
+
+        return {'FINISHED'}
+
+
 
 class SelectGroup(bpy.types.Operator):
     """Select Group"""
@@ -54,6 +67,11 @@ class AddonControlMenu(bpy.types.Menu):
 
         active_object = bpy.context.active_object
 
+        
+        if(active_object.parent != None):
+            layout.operator("object.preview_object", icon="RENDER_RESULT")
+            return {'FINISHED'}
+
         try:
             if(active_object['isEdit']):
                 return {'Need to be rebake'}
@@ -78,6 +96,7 @@ class addonControlMenuCall(bpy.types.Operator):
 UsesClasses = [
     BakeAndMerge,
     EditOriginal,
+    GetPreview,
     SelectGroup,
     AddonControlMenu, addonControlMenuCall,
 ]

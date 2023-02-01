@@ -94,4 +94,13 @@ def unmerge_selected_objects():
         obj.hide_viewport = False
         obj.select_set(True)
     
+def get_merged_object():
+    selected_object = bpy.context.active_object
+    emt_obj = selected_object.parent
+    merged_object = emt_obj.parent
+
+    for org_obj in emt_obj.children:
+        org_obj.hide_viewport = True
     
+    merged_object.hide_viewport = False
+
