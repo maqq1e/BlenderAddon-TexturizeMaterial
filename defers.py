@@ -143,7 +143,7 @@ def assign_imageTexture_into_shader(res):
     image = bpy.data.images.new(selected_object.name, width=res, height=res)
 
     # fill the image with a solid color
-    pixels = [1.0, 0.0, 0.0, 1.0] * (res * res)
+    pixels = [0.0, 0.0, 0.0, 1.0] * (res * res)
     image.pixels = pixels
 
     for mat in materials:
@@ -182,12 +182,35 @@ def generate_uv():
     bpy.ops.object.mode_set(mode='OBJECT')
     
 def select_uv(uv_num = 1):
-    # Get the second UV map
-        uv_map = uv[uv_num]
 
-        # Select all UVs in the second UV map
-        for uv in uv_map.data:
-            uv.select = True
+    selected_object = bpy.context.active_object
+    uv = selected_object.data.uv_layers
+
+    # Get the second UV map
+    uv_map = uv[uv_num]
+
+    # Select all UVs in the second UV map
+    for _uv in uv_map.data:
+        _uv.select = True
+    
+    # Make the second UV map active
+    uv.active = uv_map
+
+    
+def bake_to_texture(TYPE = 'ALL'):
+    bpy.context.scene.render.engine = 'CYCLES'
+    bpy.context.scene.cycles.device = 'GPU'
+
+    if TYPE == 'ALL':
+        # Set settings
+        bpy.context.scene.cycles.bake_type = 'COMBINED'
+        bpy.context.scene.render.bake.use_pass_direct = True
+        bpy.context.scene.render.bake.use_pass_indirect = True
+        bpy.context.scene.render.bake.use_pass_diffuse = True
+        bpy.context.scene.render.bake.use_pass_glossy = True
+        bpy.context.scene.render.bake.use_pass_transmission = True
+        bpy.context.scene.render.bake.use_pass_emit = True
+
+        bpy.ops.object.bake(type='COMBINED')
         
-        # Make the second UV map active
-        uv.active = uv_map
+    
