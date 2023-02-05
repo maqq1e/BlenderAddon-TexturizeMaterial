@@ -142,6 +142,8 @@ def assign_imageTexture_into_shader(res):
     # create a new image
     image = bpy.data.images.new(selected_object.name, width=res, height=res)
 
+    selected_object['textures'] = {'ALL': image}
+
     # fill the image with a solid color
     pixels = [0.0, 0.0, 0.0, 1.0] * (res * res)
     image.pixels = pixels
@@ -212,5 +214,35 @@ def bake_to_texture(TYPE = 'ALL'):
         bpy.context.scene.render.bake.use_pass_emit = True
 
         bpy.ops.object.bake(type='COMBINED')
+
+    if TYPE == 'COLOR':
+        bpy.context.scene.render.bake.use_pass_direct = True
+        bpy.context.scene.render.bake.use_pass_indirect = True
+        bpy.context.scene.render.bake.use_pass_color = True
+
+        bpy.ops.object.bake(type='DIFFUSE')
+
         
+def assign_texture_to_object(TYPE = 'ALL'):
+    selected_object = bpy.context.active_object
+    uv = selected_object.data.uv_layers
+
+    uv.remove(uv[0])
+
+    selected_object.data.materials.clear()
+
+    mat = bpy.data.materials.new(name=selected_object.name)
+    selected_object.data.materials.append(mat)
+
+    # Create node tree
+    mat.use_nodes = True
     
+    if TYPE == 'ALL':
+        nodes = mat.node_tree.nodes
+        tex_node = nodes.new('ShaderNodeTexImage')
+
+        tex_node.image = selected_object['textures']['ALL']
+
+        links = mat.node_tree.links
+        links.new(tex_node.outputs['Color'], nodes['Material Output'].inputs['Surface'])
+

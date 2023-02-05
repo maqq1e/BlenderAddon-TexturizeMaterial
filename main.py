@@ -13,7 +13,8 @@ class BakeAndMerge(bpy.types.Operator):
         merge_selected_objects()
         assign_imageTexture_into_shader(1024)
         select_uv(1)
-        bake_to_texture()
+        bake_to_texture('ALL')
+        assign_texture_to_object()
 
         return {'FINISHED'}
 
