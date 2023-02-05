@@ -155,3 +155,39 @@ def assign_imageTexture_into_shader(res):
 
         # specify the image file to use for the texture
         img_tex_node.image = image
+
+def generate_uv():
+    selected_object = bpy.context.active_object
+    uv = selected_object.data.uv_layers
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    selected_object.select_set(True)    
+    bpy.context.view_layer.objects.active = selected_object
+    bpy.ops.object.mode_set(mode='EDIT')
+
+    if len(uv) == 2:
+        select_uv(1)
+        try:
+            bpy.ops.uvpackmaster2.uv_pack()
+        except bpy.ops.uvpackmaster2:
+            bpy.ops.uv.pack_islands(margin=0.1)
+
+    if len(uv) == 1:
+        # Unwrap the UVs
+        bpy.ops.mesh.uv_texture_add()
+        bpy.ops.uv.smart_project()
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    
+def select_uv(uv_num = 1):
+    # Get the second UV map
+        uv_map = uv[uv_num]
+
+        # Select all UVs in the second UV map
+        for uv in uv_map.data:
+            uv.select = True
+        
+        # Make the second UV map active
+        uv.active = uv_map
