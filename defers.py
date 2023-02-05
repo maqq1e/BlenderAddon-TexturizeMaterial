@@ -20,36 +20,14 @@ def setup_scene_folders():
     
     return _sourced_
     
-
-# def merge_selected_objects(_sourced_):
-    ''''''
-    _sourced_.hide_viewport = False
-        
-    # Get selected objects
-    original_objects = bpy.context.selected_objects
-        
-    # Move all original_objects to this new source collection
-    index = bpy.data.collections.find(SOURCED_COL) + 1
-    bpy.ops.object.move_to_collection(collection_index=index)
-    
-    # Dublicate objects in scene
-    bpy.ops.object.duplicate(linked=False)      
-    # Merge the copies into one mesh
-    bpy.ops.object.join()
-    # Select this joited object
-    new_obj = bpy.context.active_object
-    # Rename it
-    dot_index = new_obj.name.index('.')
-    new_obj.name = new_obj.name[:dot_index] + '_bkd'
-    
-    # Move it into PREFAB collection
-    index = bpy.data.collections.find(PREFAB_COL) + 1
-    bpy.ops.object.move_to_collection(collection_index=index)
-    
-    # Add a property to the new mesh that contains the list of original selected objects
-    new_obj["original_objects"] = original_objects
-    
-    _sourced_.hide_viewport = True
+def delete_image_texture_nodes(obj):
+    if obj.type == 'MESH':
+        for mat in obj.data.materials:
+            if mat.use_nodes:
+                nodes = mat.node_tree.nodes
+                for node in nodes:
+                    if node.type == 'TEX_IMAGE':
+                        nodes.remove(node)
 
 def merge_selected_objects():
     # Get selected objects
@@ -120,9 +98,13 @@ def delete_merged_object():
     else:  
         merged_object = selected_object.parent.parent
 
+    
     for mrg_child in merged_object.children:
         if(mrg_child.type == 'EMPTY'):
             for org_obj in mrg_child.children:
+                
+                delete_image_texture_nodes(org_obj)
+
                 org_obj.hide_viewport = False
                 org_obj.location = org_obj.location + merged_object.location
                 result_rotation = [a + b for a, b in zip(org_obj.rotation_euler, merged_object.rotation_euler)]
