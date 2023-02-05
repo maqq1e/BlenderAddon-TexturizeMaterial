@@ -11,8 +11,7 @@ class BakeAndMerge(bpy.types.Operator):
     def execute(self, context):
         
         merge_selected_objects()
-
-        
+        assign_imageTexture_into_shader(1024)
         return {'FINISHED'}
 
         
@@ -67,8 +66,8 @@ class SelectGroup(bpy.types.Operator):
     
 
     def execute(self, context):                
-        bpy.ops.object.select_grouped(type='PARENT')
-
+        if(bpy.context.active_object.parent):
+            bpy.ops.object.select_grouped(type='PARENT')
         
         return {'FINISHED'}
         
@@ -109,13 +108,13 @@ class AddonControlMenu(bpy.types.Menu):
         layout.operator("object.delete_merged", icon="TRASH")
 
 
-
 class addonControlMenuCall(bpy.types.Operator):
     bl_idname = "wm.call_menu_example"
     bl_label = "Open the custom menu"
 
     def execute(self, context):
         bpy.ops.wm.call_menu(name=AddonControlMenu.bl_idname)
+
         return {'FINISHED'}
 
 

@@ -83,6 +83,12 @@ def merge_selected_objects():
     merged_object['isEdit'] = False
     merged_object['original'] = original_objects
 
+    bpy.ops.object.select_all(action='DESELECT')
+
+    merged_object.select_set(True)
+    bpy.context.view_layer.objects.active = merged_object
+    
+
 def unmerge_selected_objects():
     selected_object = bpy.context.active_object
 
@@ -127,3 +133,25 @@ def delete_merged_object():
         
     bpy.data.objects.remove(merged_object)
     
+def assign_imageTexture_into_shader(res):
+    selected_object = bpy.context.active_object
+
+    # get the reference to the materials of the object
+    materials = selected_object.data.materials
+
+    # create a new image
+    image = bpy.data.images.new(selected_object.name, width=res, height=res)
+
+    # fill the image with a solid color
+    pixels = [1.0, 0.0, 0.0, 1.0] * (res * res)
+    image.pixels = pixels
+
+    for mat in materials:
+        # get the reference to the shader editor for the material
+        shader_editor = mat.node_tree
+
+        # create a new image texture node
+        img_tex_node = shader_editor.nodes.new(type="ShaderNodeTexImage")
+
+        # specify the image file to use for the texture
+        img_tex_node.image = image
