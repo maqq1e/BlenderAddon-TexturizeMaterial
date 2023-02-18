@@ -11,10 +11,10 @@ class BakeAndMerge(bpy.types.Operator):
     def execute(self, context):
 
         merge_selected_objects()
-        assign_imageTexture_into_shader(1024)
+        assign_imageTexture_into_shader(512)
         select_uv(1)
-        #bake_to_texture('ALL')
-        #assign_texture_to_object()
+        bake_to_texture('ALL')
+        assign_texture_to_object()
 
         return {'FINISHED'}
 

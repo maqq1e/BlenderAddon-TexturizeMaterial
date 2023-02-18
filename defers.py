@@ -55,15 +55,19 @@ def merge_selected_objects():
         obj_matrix = obj.matrix_world.copy()
         obj.parent = org_emp
         obj.matrix_world = obj_matrix
+        obj.hide_render = True
         obj.hide_viewport = True
 
-
+    org_emp.hide_render = True
+    org_emp.hide_viewport = True
+    
     merged_object['isEdit'] = False
     merged_object['original'] = original_objects
 
     bpy.ops.object.select_all(action='DESELECT')
 
     merged_object.select_set(True)
+    merged_object.hide_render = False
     bpy.context.view_layer.objects.active = merged_object
     
 
@@ -191,8 +195,8 @@ def bake_to_texture(TYPE = 'ALL'):
         bpy.context.scene.render.bake.use_pass_direct = True
         bpy.context.scene.render.bake.use_pass_indirect = True
         bpy.context.scene.render.bake.use_pass_diffuse = True
-        bpy.context.scene.render.bake.use_pass_glossy = True
-        bpy.context.scene.render.bake.use_pass_transmission = True
+        bpy.context.scene.render.bake.use_pass_glossy = False
+        bpy.context.scene.render.bake.use_pass_transmission = False
         bpy.context.scene.render.bake.use_pass_emit = True
 
         bpy.ops.object.bake(type='COMBINED')
@@ -203,6 +207,7 @@ def bake_to_texture(TYPE = 'ALL'):
         bpy.context.scene.render.bake.use_pass_color = True
 
         bpy.ops.object.bake(type='DIFFUSE')
+
 
         
 def assign_texture_to_object(TYPE = 'ALL'):
