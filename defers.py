@@ -20,14 +20,15 @@ def setup_scene_folders():
     
     return _sourced_
     
-def delete_image_texture_nodes(obj):
+def delete_image_texture_nodes(obj, texture_name):
     if obj.type == 'MESH':
         for mat in obj.data.materials:
             if mat.use_nodes:
                 nodes = mat.node_tree.nodes
                 for node in nodes:
                     if node.type == 'TEX_IMAGE':
-                        nodes.remove(node)
+                        if node.image == texture_name:
+                            nodes.remove(node)
 
 def merge_selected_objects():
     # Get selected objects
@@ -91,6 +92,8 @@ def get_merged_object():
         org_obj.hide_viewport = True
     
     merged_object.hide_viewport = False
+    merged_object.select_set(True)
+    bpy.context.view_layer.objects.active = merged_object
 
 def delete_merged_object():
     selected_object = bpy.context.active_object
@@ -107,7 +110,7 @@ def delete_merged_object():
         if(mrg_child.type == 'EMPTY'):
             for org_obj in mrg_child.children:
                 
-                delete_image_texture_nodes(org_obj)
+                delete_image_texture_nodes(org_obj, merged_object['textures']['ALL'])
 
                 org_obj.hide_viewport = False
                 org_obj.location = org_obj.location + merged_object.location
@@ -140,6 +143,7 @@ def assign_imageTexture_into_shader(res):
 
         # create a new image texture node
         img_tex_node = shader_editor.nodes.new(type="ShaderNodeTexImage")
+        img_tex_node.location = 0,1000
 
         # specify the image file to use for the texture
         img_tex_node.image = image
@@ -216,7 +220,12 @@ def assign_texture_to_object(TYPE = 'ALL'):
 
     uv.remove(uv[0])
 
+
+    delete_image_texture_nodes(selected_object, selected_object['textures']['ALL'])
+
     selected_object.data.materials.clear()
+
+
 
     mat = bpy.data.materials.new(name=selected_object.name)
     selected_object.data.materials.append(mat)
@@ -227,6 +236,8 @@ def assign_texture_to_object(TYPE = 'ALL'):
     if TYPE == 'ALL':
         nodes = mat.node_tree.nodes
         tex_node = nodes.new('ShaderNodeTexImage')
+
+        tex_node.location = 0,1000
 
         tex_node.image = selected_object['textures']['ALL']
 

@@ -18,6 +18,21 @@ class BakeAndMerge(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class ReBakeAndMerge(bpy.types.Operator):
+    """ReBake Objects Material Into Texture"""
+    bl_idname = "object.make_objects_rebaked"
+    bl_label = "ReBake and ReMerge"
+    
+    def execute(self, context):
+
+        merge_selected_objects()
+        assign_imageTexture_into_shader(512)
+        select_uv(1)
+        bake_to_texture('ALL')
+        assign_texture_to_object()
+
+        return {'FINISHED'}
+
         
 
 class EditOriginal(bpy.types.Operator):
@@ -95,6 +110,7 @@ class AddonControlMenu(bpy.types.Menu):
         # Preview
         if(active_object.parent != None):
             layout.operator("object.preview_object", icon="RENDER_RESULT")
+            layout.operator("object.make_objects_rebaked", icon="EXPERIMENTAL")
         else:
             try:
                 # Rebake if original objects changed
@@ -125,6 +141,7 @@ class addonControlMenuCall(bpy.types.Operator):
 
 UsesClasses = [
     BakeAndMerge,
+    ReBakeAndMerge,
     EditOriginal,
     GetPreview,
     DeleteMergedObject,
